@@ -65,10 +65,11 @@ Write-Host "  newproject              # Create new project structure" -Foregroun
 Write-Host "  newpy                   # Create Python project with venv" -ForegroundColor White
 Write-Host ""
 Write-Host "Drupal Development:" -ForegroundColor Yellow
-Write-Host "  new-drupal-core         # Set up Drupal core for contributing" -ForegroundColor White
-Write-Host "  new-drupal-module <name>  # Set up a contrib module" -ForegroundColor White
-Write-Host "  new-drupal-theme <name>   # Set up a contrib theme" -ForegroundColor White
-Write-Host "  new-drupal-headless <name># Create a new headless Drupal site" -ForegroundColor White
+Write-Host "  new-drupal -ProjectName <name> # Create a new Drupal site" -ForegroundColor White
+Write-Host "  new-drupal-core                # Set up Drupal core for contributing" -ForegroundColor White
+Write-Host "  new-drupal-module <name>         # Set up a contrib module" -ForegroundColor White
+Write-Host "  new-drupal-theme <name>          # Set up a contrib theme" -ForegroundColor White
+Write-Host "  new-drupal-headless <name>     # Create a new headless Drupal site" -ForegroundColor White
 Write-Host ""
 Write-Host "Development Shortcuts:" -ForegroundColor Yellow
 Write-Host "  dev server 3000         # Start dev server on port 3000" -ForegroundColor White

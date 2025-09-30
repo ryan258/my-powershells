@@ -14,4 +14,4 @@ Write-Host "Setting up environment for Drupal Core contribution..." -ForegroundC
 # Get the path to the main script
 $scriptPath = "$PSScriptRoot\new-drupal-project.ps1"
 
-& $scriptPath -ProjectName $projectName -GitRepo $coreRepo
+& $scriptPath -ProjectName $projectName -GitRepo $coreRepo -SetupType core

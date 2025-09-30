@@ -20,4 +20,4 @@ Write-Host "Setting up environment for Drupal theme: $ThemeName..." -ForegroundC
 # Get the path to the main script
 $scriptPath = "$PSScriptRoot\new-drupal-project.ps1"
 
-& $scriptPath -ProjectName $ThemeName -GitRepo $themeRepo
+& $scriptPath -ProjectName $ThemeName -GitRepo $themeRepo -SetupType theme -LinkExtensionDependencies

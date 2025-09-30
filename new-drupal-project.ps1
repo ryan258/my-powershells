@@ -1,120 +1,350 @@
 <#
 .SYNOPSIS
-    Automates the setup of a new Drupal 11 project using DDEV.
+    Automates the setup of Drupal development environments using DDEV.
 
 .DESCRIPTION
-    This script handles everything from creating the project directory to installing Drupal,
-    providing a ready-to-use local development environment. It can either create a
-    brand-new site or clone an existing repository for contributing.
+    Supports multiple workflows:
+      - Create a brand-new Drupal site using the recommended project template.
+      - Clone an existing Drupal project and bootstrap it with DDEV.
+      - Scaffold contribution sandboxes for Drupal core, modules, or themes.
 
 .PARAMETER ProjectName
-    The name of the project and the directory to be created. This is mandatory.
+    The name of the project directory to create (or use when cloning).
 
 .PARAMETER GitRepo
-    (Optional) The full Git URL of a Drupal project to clone. If provided, the script
-    will set up a contribution environment. If omitted, it will create a new site.
+    (Optional) Git URL of a Drupal project, module, or theme to clone.
+
+.PARAMETER SetupType
+    Controls the workflow. Valid values: site (default), core, module, theme.
+
+.PARAMETER Docroot
+    (Optional) Overrides docroot detection when cloning existing projects.
+
+.PARAMETER SkipLaunch
+    Skip the final `ddev launch` call. Connection info is still printed.
+
+.PARAMETER SkipSiteInstall
+    Skip the automatic `ddev drush site:install` step (useful when importing an existing database).
+
+.PARAMETER LinkExtensionDependencies
+    Adds the cloned module/theme as a Composer path repository and runs `composer require` so its PHP dependencies are installed automatically.
 
 .EXAMPLE
-    # Create a new Drupal project named 'my-new-site'
-    .new-drupal-project.ps1 -ProjectName my-new-site
+    # Create a new Drupal site named "my-project"
+    .\new-drupal-project.ps1 -ProjectName my-project
 
 .EXAMPLE
-    # Set up a local environment for contributing to the 'token' module
-    .new-drupal-project.ps1 -ProjectName token -GitRepo https://git.drupalcode.org/project/token.git
+    # Bootstrap a Drupal core contribution checkout
+    .\new-drupal-project.ps1 -ProjectName drupal -GitRepo https://git.drupalcode.org/project/drupal.git -SetupType core
+
+.EXAMPLE
+    # Create a contribution sandbox for the "token" module with dependency linking
+    .\new-drupal-project.ps1 -ProjectName token -GitRepo https://git.drupalcode.org/project/token.git -SetupType module -LinkExtensionDependencies
 #>
 param(
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]$ProjectName,
 
     [Parameter()]
-    [string]$GitRepo
+    [string]$GitRepo,
+
+    [Parameter()]
+    [ValidateSet('site', 'core', 'module', 'theme')]
+    [string]$SetupType = 'site',
+
+    [Parameter()]
+    [string]$Docroot,
+
+    [switch]$SkipLaunch,
+    [switch]$SkipSiteInstall,
+    [switch]$LinkExtensionDependencies
 )
 
 $ErrorActionPreference = 'Stop'
 
-# --- Verification ---
-Write-Host "Checking for DDEV..." -ForegroundColor Cyan
-$ddevCheck = Get-Command ddev -ErrorAction SilentlyContinue
-if (-not $ddevCheck) {
-    Write-Host "DDEV command not found. Please ensure DDEV is installed and accessible in your PATH." -ForegroundColor Red
-    exit 1
+function Ensure-Command {
+    param([string]$Name)
+    if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
+        throw "Required command '$Name' not found in PATH."
+    }
 }
-Write-Host "DDEV found." -ForegroundColor Green
 
-Write-Host "Checking for Git..." -ForegroundColor Cyan
-$gitCheck = Get-Command git -ErrorAction SilentlyContinue
-if (-not $gitCheck) {
-    Write-Host "Git command not found. Please ensure Git is installed and accessible in your PATH." -ForegroundColor Red
-    exit 1
+function Resolve-Docroot {
+    param(
+        [string]$ProjectRoot,
+        [string]$UserDocroot
+    )
+
+    if ($UserDocroot) {
+        $candidatePath = if ($UserDocroot -eq '.' -or $UserDocroot -eq '') { $ProjectRoot } else { Join-Path $ProjectRoot $UserDocroot }
+        if (-not (Test-Path $candidatePath)) {
+            throw "Docroot override '$UserDocroot' does not exist inside $ProjectRoot."
+        }
+        if ($UserDocroot -eq '.' -or $UserDocroot -eq '') {
+            return '.'
+        }
+        return $UserDocroot
+    }
+
+    $candidates = @('web', 'docroot', 'html', 'public', '.')
+    foreach ($candidate in $candidates) {
+        $path = if ($candidate -eq '.') { $ProjectRoot } else { Join-Path $ProjectRoot $candidate }
+        $hasIndex = Test-Path (Join-Path $path 'index.php')
+        $hasCoreBootstrap = Test-Path (Join-Path $path 'core/install.php')
+        if ($hasIndex -or $hasCoreBootstrap) {
+            if ($candidate -eq '.') {
+                return '.'
+            }
+            return $candidate
+        }
+    }
+
+    return $null
 }
-Write-Host "Git found." -ForegroundColor Green
 
-# --- Main Logic ---
+function Show-ConnectionInfo {
+    param([switch]$SkipLaunch)
+
+    try {
+        ddev describe
+    } catch {
+        Write-Host "Unable to retrieve DDEV connection info: $($_.Exception.Message)" -ForegroundColor Yellow
+        return
+    }
+
+    if ($SkipLaunch) {
+        Write-Host "Skipped automatic browser launch. Run 'ddev launch' when ready." -ForegroundColor Yellow
+    } else {
+        try {
+            ddev launch
+        } catch {
+            Write-Host "Failed to launch browser automatically: $($_.Exception.Message)" -ForegroundColor Yellow
+        }
+    }
+}
+
+function Setup-NewSite {
+    param(
+        [string]$ProjectPath,
+        [switch]$SkipLaunch,
+        [switch]$SkipSiteInstall
+    )
+
+    Write-Host "--- Creating a new Drupal project ---" -ForegroundColor Yellow
+
+    New-Item -Path $ProjectPath -ItemType Directory | Out-Null
+    Push-Location $ProjectPath
+    try {
+        Write-Host "(1/5) Configuring DDEV" -ForegroundColor Cyan
+        ddev config --project-type=drupal11 --docroot=web --create-docroot | Out-Null
+
+        Write-Host "(2/5) Installing Drupal scaffold with Composer" -ForegroundColor Cyan
+        ddev composer create drupal/recommended-project . --no-progress | Out-Null
+
+        Write-Host "(3/5) Starting DDEV" -ForegroundColor Cyan
+        ddev start | Out-Null
+
+        if (-not $SkipSiteInstall) {
+            Write-Host "(4/5) Installing Drupal via Drush" -ForegroundColor Cyan
+            ddev drush site:install -y | Out-Null
+        } else {
+            Write-Host "(4/5) Skipping Drush site install (-SkipSiteInstall provided)." -ForegroundColor Yellow
+        }
+
+        Write-Host "(5/5) Finalizing environment" -ForegroundColor Cyan
+        Show-ConnectionInfo -SkipLaunch:$SkipLaunch
+    } finally {
+        Pop-Location
+    }
+}
+
+function Setup-ExistingProject {
+    param(
+        [string]$ProjectPath,
+        [string]$GitRepo,
+        [string]$Docroot,
+        [switch]$SkipLaunch,
+        [switch]$SkipSiteInstall
+    )
+
+    Write-Host "--- Cloning existing project ---" -ForegroundColor Yellow
+    git clone $GitRepo $ProjectPath | Out-Null
+
+    Push-Location $ProjectPath
+    try {
+        $projectRoot = (Get-Location).ProviderPath
+        $resolvedDocroot = Resolve-Docroot -ProjectRoot $projectRoot -UserDocroot $Docroot
+        if (-not $resolvedDocroot) {
+            throw "Unable to determine docroot for cloned project. Specify -Docroot explicitly."
+        }
+
+        $docrootArg = if ($resolvedDocroot -eq '.') { '--docroot=.' } else { "--docroot=$resolvedDocroot" }
+
+        Write-Host "Docroot detected: $resolvedDocroot" -ForegroundColor Green
+
+        Write-Host "(1/4) Configuring DDEV" -ForegroundColor Cyan
+        ddev config --project-type=drupal11 $docrootArg | Out-Null
+
+        Write-Host "(2/4) Starting DDEV" -ForegroundColor Cyan
+        ddev start | Out-Null
+
+        $composerFile = Join-Path $projectRoot 'composer.json'
+        if (Test-Path $composerFile) {
+            Write-Host "(3/4) Installing Composer dependencies" -ForegroundColor Cyan
+            ddev composer install --no-progress | Out-Null
+        } else {
+            Write-Host "composer.json not found; skipping dependency install." -ForegroundColor Yellow
+        }
+
+        if (-not $SkipSiteInstall) {
+            Write-Host "(4/4) Attempting Drupal site install" -ForegroundColor Cyan
+            try {
+                ddev drush site:install -y | Out-Null
+            } catch {
+                Write-Host "Drush site:install did not complete automatically: $($_.Exception.Message)" -ForegroundColor Yellow
+                Write-Host "You may need to import an existing database or complete installation manually." -ForegroundColor Yellow
+            }
+        } else {
+            Write-Host "(4/4) Skipping Drush site install (-SkipSiteInstall provided)." -ForegroundColor Yellow
+        }
+
+        Show-ConnectionInfo -SkipLaunch:$SkipLaunch
+    } finally {
+        Pop-Location
+    }
+}
+
+function Setup-ContributionSandbox {
+    param(
+        [ValidateSet('module', 'theme')]
+        [string]$Kind,
+        [string]$ProjectPath,
+        [string]$GitRepo,
+        [switch]$SkipLaunch,
+        [switch]$SkipSiteInstall,
+        [switch]$LinkDependencies
+    )
+
+    Setup-NewSite -ProjectPath $ProjectPath -SkipLaunch:$true -SkipSiteInstall:$SkipSiteInstall
+
+    Push-Location $ProjectPath
+    try {
+        $subdir = if ($Kind -eq 'module') { 'web/modules/custom' } else { 'web/themes/custom' }
+        $targetDir = Join-Path $subdir $ProjectName
+        $absoluteTarget = Join-Path (Get-Location).ProviderPath $targetDir
+
+        $targetParent = Split-Path $absoluteTarget -Parent
+        if (-not (Test-Path $targetParent)) {
+            New-Item -Path $targetParent -ItemType Directory -Force | Out-Null
+        }
+
+        Write-Host "Cloning $Kind repository into $targetDir" -ForegroundColor Cyan
+        git clone $GitRepo $absoluteTarget | Out-Null
+
+        if ($LinkDependencies) {
+            $relativePath = ($targetDir -replace '\\', '/')
+            $repositoryKey = "sandbox-$ProjectName"
+            try {
+                Write-Host "Linking $Kind dependencies via Composer path repository" -ForegroundColor Cyan
+                ddev composer config "repositories.$repositoryKey" path $relativePath --working-dir . | Out-Null
+            } catch {
+                Write-Host "Failed to register Composer path repository: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+
+            $extensionComposerPath = Join-Path $absoluteTarget 'composer.json'
+            $packageName = $null
+            if (Test-Path $extensionComposerPath) {
+                try {
+                    $extensionComposer = Get-Content -Path $extensionComposerPath -Raw | ConvertFrom-Json
+                    if ($extensionComposer.name) {
+                        $packageName = [string]$extensionComposer.name
+                    }
+                } catch {
+                    Write-Host "Warning: Unable to parse $Kind composer.json: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+
+            if (-not $packageName) {
+                $packageName = "drupal/$ProjectName"
+            }
+
+            try {
+                ddev composer require "$packageName:@dev" --no-progress | Out-Null
+                Write-Host "Composer dependencies for '$packageName' are linked." -ForegroundColor Green
+            } catch {
+                Write-Host "Failed to install Composer dependencies for '$packageName': $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+
+        if (-not $SkipSiteInstall) {
+            if ($Kind -eq 'module') {
+                try {
+                    ddev drush en $ProjectName -y | Out-Null
+                    Write-Host "Module '$ProjectName' enabled." -ForegroundColor Green
+                } catch {
+                    Write-Host "Failed to enable module automatically: $($_.Exception.Message)" -ForegroundColor Yellow
+                    Write-Host "Enable it manually with 'ddev drush en $ProjectName'." -ForegroundColor Yellow
+                }
+            } else {
+                try {
+                    ddev drush theme:enable $ProjectName -y | Out-Null
+                    Write-Host "Theme '$ProjectName' enabled." -ForegroundColor Green
+                } catch {
+                    Write-Host "Failed to enable theme automatically: $($_.Exception.Message)" -ForegroundColor Yellow
+                    Write-Host "Enable it manually with 'ddev drush theme:enable $ProjectName'." -ForegroundColor Yellow
+                }
+            }
+        } else {
+            Write-Host "Site install was skipped; enable the $Kind after completing installation." -ForegroundColor Yellow
+        }
+
+        Write-Host "Contribution sandbox ready at $ProjectPath" -ForegroundColor Green
+        Show-ConnectionInfo -SkipLaunch:$SkipLaunch
+    } finally {
+        Pop-Location
+    }
+}
+
+Ensure-Command -Name 'ddev'
+Ensure-Command -Name 'git'
+
 $projectPath = Join-Path (Get-Location) $ProjectName
-
 if (Test-Path $projectPath) {
-    Write-Host "Error: A directory named '$ProjectName' already exists in this location." -ForegroundColor Red
-    exit 1
+    throw "A directory named '$ProjectName' already exists in this location."
 }
 
+$originalLocation = Get-Location
 try {
-    if ([string]::IsNullOrEmpty($GitRepo)) {
-        # --- New Project Workflow ---
-        Write-Host "--- Creating a new Drupal project: $ProjectName ---" -ForegroundColor Yellow
-
-        Write-Host "(1/6) Creating project directory..." -ForegroundColor Cyan
-        New-Item -Path $projectPath -ItemType Directory | Out-Null
-        Set-Location $projectPath
-
-        Write-Host "(2/6) Configuring DDEV..." -ForegroundColor Cyan
-        ddev config --project-type=drupal11 --docroot=web --create-docroot
-
-        Write-Host "(3/6) Starting DDEV environment..." -ForegroundColor Cyan
-        ddev start
-
-        Write-Host "(4/6) Downloading Drupal with Composer..." -ForegroundColor Cyan
-        ddev composer create drupal/recommended-project --no-install --no-progress
-
-        Write-Host "(5/6) Installing Drupal dependencies..." -ForegroundColor Cyan
-        ddev composer install --no-progress
-
-        Write-Host "(6/6) Installing Drupal site with Drush..." -ForegroundColor Cyan
-        ddev drush site:install -y
-    }
-    else {
-        # --- Contribution Workflow ---
-        Write-Host "--- Setting up contribution environment for $ProjectName from $GitRepo ---" -ForegroundColor Yellow
-
-        Write-Host "(1/6) Cloning repository..." -ForegroundColor Cyan
-        git clone $GitRepo $ProjectName
-        Set-Location $projectPath
-
-        Write-Host "(2/6) Configuring DDEV..." -ForegroundColor Cyan
-        ddev config --project-type=drupal11 --docroot=web
-
-        Write-Host "(3/6) Starting DDEV environment..." -ForegroundColor Cyan
-        ddev start
-
-        Write-Host "(4/6) Installing Drupal dependencies with Composer..." -ForegroundColor Cyan
-        ddev composer install --no-progress
-
-        Write-Host "(5/6) Installing Drupal site with Drush..." -ForegroundColor Cyan
-        ddev drush site:install -y
-
-        Write-Host "(6/6) Setup complete." -ForegroundColor Cyan
+    switch ($SetupType) {
+        'site' {
+            if ([string]::IsNullOrEmpty($GitRepo)) {
+                Setup-NewSite -ProjectPath $projectPath -SkipLaunch:$SkipLaunch -SkipSiteInstall:$SkipSiteInstall
+            } else {
+                Setup-ExistingProject -ProjectPath $projectPath -GitRepo $GitRepo -Docroot $Docroot -SkipLaunch:$SkipLaunch -SkipSiteInstall:$SkipSiteInstall
+            }
+        }
+        'core' {
+            if ([string]::IsNullOrEmpty($GitRepo)) {
+                throw "SetupType 'core' requires -GitRepo to clone Drupal core."
+            }
+            $coreDocroot = if ([string]::IsNullOrEmpty($Docroot)) { '.' } else { $Docroot }
+            Setup-ExistingProject -ProjectPath $projectPath -GitRepo $GitRepo -Docroot $coreDocroot -SkipLaunch:$SkipLaunch -SkipSiteInstall:$SkipSiteInstall
+        }
+        'module' {
+            if ([string]::IsNullOrEmpty($GitRepo)) {
+                throw "SetupType 'module' requires -GitRepo pointing to the module repository."
+            }
+            Setup-ContributionSandbox -Kind 'module' -ProjectPath $projectPath -GitRepo $GitRepo -SkipLaunch:$SkipLaunch -SkipSiteInstall:$SkipSiteInstall -LinkDependencies:$LinkExtensionDependencies
+        }
+        'theme' {
+            if ([string]::IsNullOrEmpty($GitRepo)) {
+                throw "SetupType 'theme' requires -GitRepo pointing to the theme repository."
+            }
+            Setup-ContributionSandbox -Kind 'theme' -ProjectPath $projectPath -GitRepo $GitRepo -SkipLaunch:$SkipLaunch -SkipSiteInstall:$SkipSiteInstall -LinkDependencies:$LinkExtensionDependencies
+        }
     }
 
-    # --- Success ---
-    Write-Host ""
-    Write-Host "✅ Project '$ProjectName' is ready!" -ForegroundColor Green
-    Write-Host ""
-    ddev describe
-    Write-Host ""
-    Write-Host "Launching your new site in the browser..." -ForegroundColor Yellow
-    ddev launch
-
-} catch {
-    Write-Host "An error occurred during setup: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host "Please check the output above for details. You may need to run 'ddev delete -O' in the '$projectPath' directory to clean up before trying again." -ForegroundColor Yellow
-    exit 1
+    Write-Host "Project '$ProjectName' is ready." -ForegroundColor Green
+} finally {
+    Set-Location $originalLocation
 }

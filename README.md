@@ -230,31 +230,47 @@ A comprehensive collection of 42 PowerShell scripts designed to boost productivi
   ```
 
 #### **Drupal Development**
-- **`new-drupal`** (`new-drupal-project.ps1`) - Create new Drupal 11 projects with DDEV
+This suite of scripts automates the setup of various Drupal development environments using DDEV. The core logic resides in `new-drupal-project.ps1`, with convenient wrappers for common tasks.
+
+- **`new-drupal`** (`new-drupal-project.ps1`) - The main script for creating new Drupal projects. It supports multiple workflows via parameters.
   ```powershell
-  new-drupal my-project           # Create new Drupal project
-  new-drupal my-site https://github.com/user/repo.git  # Clone and setup
+  # Create a brand-new standard Drupal site
+  new-drupal -ProjectName my-new-site
+
+  # Create a contribution sandbox for the Token module with dependency linking
+  new-drupal -ProjectName token -GitRepo https://git.drupalcode.org/project/token.git -SetupType module -LinkExtensionDependencies
+  
+  # Clone and bootstrap an existing Drupal site from a private repository
+  new-drupal -ProjectName my-existing-site -GitRepo git@github.com:user/my-site.git -SkipSiteInstall
   ```
 
-- **`new-drupal-headless`** (`new-headless-drupal.ps1`) - Setup headless Drupal backend
+- **`new-drupal-core`** (`drupal-core-dev.ps1`) - A wrapper to quickly set up a sandbox for contributing to Drupal Core.
   ```powershell
-  new-drupal-headless my-api      # Create headless Drupal project
+  new-drupal-core
   ```
 
-- **`new-drupal-core`** (`drupal-core-dev.ps1`) - Setup Drupal core contribution environment
+- **`new-drupal-module`** (`drupal-module-dev.ps1`) - A wrapper for setting up a contribution environment for a specific module.
   ```powershell
-  new-drupal-core                 # Clone and setup Drupal core
+  new-drupal-module token
   ```
 
-- **`new-drupal-module`** (`drupal-module-dev.ps1`) - Setup module contribution environment
+- **`new-drupal-theme`** (`drupal-theme-dev.ps1`) - A wrapper for setting up a contribution environment for a specific theme.
   ```powershell
-  new-drupal-module token         # Setup Token module for contribution
+  new-drupal-theme bootstrap5
   ```
 
-- **`new-drupal-theme`** (`drupal-theme-dev.ps1`) - Setup theme contribution environment
+- **`new-drupal-headless`** (`new-headless-drupal.ps1`) - A wrapper that sets up a standard Drupal site and provides instructions for using it as a headless backend.
   ```powershell
-  new-drupal-theme bootstrap5     # Setup Bootstrap5 theme for contribution
+  new-drupal-headless my-headless-backend
   ```
+
+**Key Features & Parameters:**
+- **`-SetupType`**: Controls the workflow. Can be `site` (default), `core`, `module`, or `theme`.
+- **`-GitRepo`**: The Git URL to clone for an existing project or for a contribution sandbox.
+- **`-LinkExtensionDependencies`**: For `module` and `theme` setups, this automatically links the extension's `composer.json` and installs its PHP dependencies.
+- **`-SkipSiteInstall`**: Skips the `ddev drush site:install` step, which is useful when you plan to import an existing database.
+- **`-Docroot`**: Manually specify the docroot if the script cannot detect it automatically.
+- **Auto-Discovery**: Automatically detects the docroot (`web`, `docroot`, etc.) in most cloned projects.
 
 ### 🔧 **Workspace & Utilities (5 scripts)**
 

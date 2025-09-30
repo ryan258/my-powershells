@@ -1,34 +1,18 @@
-All critical issues have been resolved! ✅
+Project Status - 2025-09-30
+---------------------------
 
-  Windows 11 Compatibility: VERIFIED ✅
-  - Running on Windows 11 Build 26100 (24H2)
-  - All scripts properly use Windows-native PowerShell cmdlets
-  - Toast notifications and Windows APIs working correctly
-  - No path or execution policy conflicts
+- Windows 11 compatibility remains verified (Build 26100 / 24H2).
+- Drupal automation scripts now scaffold working DDEV environments for core, modules, and themes.
 
-  Previously Identified Issues (NOW FIXED) ✅
+Resolved Items
+--------------
+1. [Done] new-drupal-project.ps1 now installs the recommended project scaffold in-place and runs Composer/Drush in the correct order.
+2. [Done] Docroot detection handles cloned projects (core, contrib profiles) and accepts an explicit -Docroot override.
+3. [Done] drupal-core-dev.ps1, drupal-module-dev.ps1, and drupal-theme-dev.ps1 call the helper with the appropriate SetupType; module/theme sandboxes clone into custom directories and auto-enable the extension.
+4. [Done] Added Composer path repository wiring for module/theme sandboxes so extension dependencies can be installed automatically (`-LinkExtensionDependencies`).
+5. [Done] Introduced `-SkipSiteInstall` to bypass Drush installation when importing databases or handling pre-installed sites.
 
-  1. ✅ FIXED - Broken Aliases in Profile Reference
-  2. ✅ FIXED - Drupal Script Dependency Resolution (now uses $PSScriptRoot)
-  3. ✅ FIXED - Array Expansion in archive_manager.ps1:50 (removed incorrect @splatting)
-  4. ✅ FIXED - README Script Count (now correctly shows 42 scripts)
-  5. ✅ FIXED - Hardcoded Path in greeting.ps1 (now uses Join-Path)
-  6. ✅ NOTED - Git validation would be nice-to-have but not critical
-  7. ✅ NOTED - Weather.ps1 default city is user-specific (by design)
-  8. ✅ NOTED - Error handling is intentionally varied based on script needs
-  9. ✅ FIXED - Network speed test now has 2 fallback URLs
-  10. ✅ NOTED - takebreak alias doesn't conflict; documentation is accurate
-
-  Good Practices Found ✅
-
-  - Excellent parameter documentation with .SYNOPSIS blocks
-  - Good use of color-coded output for user feedback
-  - Comprehensive error messages with helpful tips
-  - Toast notification fallbacks
-  - Backup creation before destructive operations
-  - Proper use of robocopy for efficient backups
-
-  Summary
-
-  The project is well-structured and functional, but has 3 critical bugs that will cause failures, 7 medium issues that affect portability/accuracy, and several minor inconsistencies. The       
-  most urgent fixes are the broken aliases in the profile reference file and the Drupal script path resolution.
+Next Steps / Enhancements
+-------------------------
+- Optional: extend dependency linking to support multiple modules/themes in a single run (bulk setup).
+- Optional: offer a `-SkipDependencyLink` flag on module/theme wrappers for contributors who prefer manual Composer wiring.

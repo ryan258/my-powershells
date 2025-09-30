@@ -20,4 +20,4 @@ Write-Host "Setting up environment for Drupal module: $ModuleName..." -Foregroun
 # Get the path to the main script
 $scriptPath = "$PSScriptRoot\new-drupal-project.ps1"
 
-& $scriptPath -ProjectName $ModuleName -GitRepo $moduleRepo
+& $scriptPath -ProjectName $ModuleName -GitRepo $moduleRepo -SetupType module -LinkExtensionDependencies

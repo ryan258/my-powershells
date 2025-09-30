@@ -12,9 +12,18 @@ We will use **DDEV**, a professional, open-source tool that abstracts away the c
 
 With the new automation scripts, setting up any type of Drupal project is now a single command. These commands match your specific intention, whether you are starting a new project or contributing to an existing one.
 
-### To Start Your Own Headless Project
+### To Start a New Drupal Site
 
-This sets up a new Drupal site intended for use as a headless CMS backend.
+This creates a standard, empty Drupal site, ready for development.
+
+```powershell
+new-drupal -ProjectName <your-project-name>
+```
+*Example: `new-drupal -ProjectName my-new-site`*
+
+### To Start a Headless Project
+
+This sets up a new Drupal site and provides guidance for using it as a headless CMS backend.
 
 ```powershell
 new-drupal-headless <your-project-name>
@@ -23,7 +32,7 @@ new-drupal-headless <your-project-name>
 
 ### To Contribute to Drupal Core
 
-This clones the main Drupal repository and fully configures it for local development.
+This creates a local development sandbox with Drupal core cloned and ready for contributions.
 
 ```powershell
 new-drupal-core
@@ -31,7 +40,7 @@ new-drupal-core
 
 ### To Contribute to a Module or Theme
 
-These commands will clone the specified project from Drupal.org and set it up for you.
+This creates a full Drupal sandbox, then clones the specified module or theme into it, and can even link its dependencies for you.
 
 ```powershell
 # To set up a module (e.g., the Token module)
@@ -84,24 +93,22 @@ This section briefly explains the manual steps that the intention-driven aliases
 
 ### Workflow for a **New** Drupal Project
 
-This workflow is used by the `new-drupal-headless` alias.
+This workflow is used by the `new-drupal` and `new-drupal-headless` aliases.
 
-1.  **Create a Project Folder**: `mkdir my-drupal-site && cd my-drupal-site`
-2.  **Configure DDEV**: `ddev config --project-type=drupal11 --docroot=web --create-docroot`
-3.  **Start DDEV**: `ddev start`
-4.  **Install Drupal**: `ddev composer create drupal/recommended-project` and `ddev drush site:install -y`
-5.  **Launch Site**: `ddev launch`
+1.  **Create Project Folder**: A directory for the project is created.
+2.  **Configure DDEV**: `ddev config` is run to prepare the environment.
+3.  **Install Drupal Scaffold**: `ddev composer create` downloads the recommended Drupal project structure.
+4.  **Start DDEV & Install Site**: The environment is started, and `ddev drush site:install` creates the database and runs the installer.
+5.  **Launch Site**: The new site is opened in the browser.
 
 ### Workflow for **Contributing** to Drupal
 
-This workflow is used by the `new-drupal-core`, `new-drupal-module`, and `new-drupal-theme` aliases.
+This workflow is used by the `new-drupal-core`, `new-drupal-module`, and `new-drupal-theme` aliases. It creates a complete, runnable Drupal "sandbox" site and places the extension you want to work on inside it.
 
-1.  **Clone the Project**: `git clone <repo_url>`
-2.  **Configure DDEV**: `ddev config --project-type=drupal11 --docroot=web`
-3.  **Start DDEV**: `ddev start`
-4.  **Install Dependencies**: `ddev composer install`
-5.  **Install Site**: `ddev drush site:install -y`
-6.  **Launch Site**: `ddev launch`
+1.  **Create Sandbox Project**: A new Drupal site is created first (similar to the workflow above).
+2.  **Clone Extension**: The specific module, theme, or core repository is cloned from Drupal.org into the correct subdirectory (`web/modules/custom`, `web/themes/custom`, etc.).
+3.  **Link Dependencies (Optional)**: The script can automatically update the sandbox's `composer.json` to recognize the cloned extension and install its dependencies.
+4.  **Enable Extension**: The script attempts to enable the module or theme (`drush en`, `drush theme:enable`) so it's ready for testing immediately.
 
 ---
 
