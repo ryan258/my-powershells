@@ -3,6 +3,8 @@ param(
     [string]$Mode
 )
 
+$ErrorActionPreference = 'Stop'
+
 switch ($Mode.ToLower()) {
     "bytype" {
         Write-Host "Organizing files by type..." -ForegroundColor Cyan

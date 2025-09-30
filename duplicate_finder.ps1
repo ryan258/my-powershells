@@ -9,6 +9,8 @@ param(
     [string]$MinSize = "1KB"
 )
 
+$ErrorActionPreference = 'Stop'
+
 Write-Host "Searching for duplicate files in: $SearchPath" -ForegroundColor Cyan
 Write-Host "This may take a while for large directories..." -ForegroundColor Yellow
 Write-Host ""

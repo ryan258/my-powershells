@@ -9,6 +9,8 @@ param(
     [string]$Parameter
 )
 
+$ErrorActionPreference = 'Stop'
+
 function Format-FileSize {
     param([long]$Bytes)
 

@@ -1,5 +1,7 @@
 param(
     [Parameter(Position=0)]
+    # The default city to use if none is provided.
+    # To change the default, modify the value below.
     [string]$City = "Bentonville"
 )
 

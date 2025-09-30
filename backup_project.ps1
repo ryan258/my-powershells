@@ -6,6 +6,8 @@ param(
     [string]$BackupLocation = "$env:USERPROFILE\Backups"
 )
 
+$ErrorActionPreference = 'Stop'
+
 Write-Host "Starting backup of current project..." -ForegroundColor Cyan
 
 $sourcePath = Resolve-Path $SourcePath

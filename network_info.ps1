@@ -73,22 +73,38 @@ switch ($Action.ToLower()) {
         Write-Host "=== Network Speed Test ===" -ForegroundColor Green
         Write-Host "Testing connection speed..." -ForegroundColor Yellow
 
-        try {
-            $testUrl = "http://speedtest.tele2.net/10MB.zip"
-            $startTime = Get-Date
+        $testUrls = @(
+            "http://speedtest.tele2.net/10MB.zip",
+            "http://ipv4.download.thinkbroadband.com/10MB.zip"
+        )
+        $testFileSizeMB = 10
+        $success = $false
 
-            $response = Invoke-WebRequest -Uri $testUrl -OutFile $null -PassThru -UseBasicParsing -TimeoutSec 30
-            $endTime = Get-Date
+        foreach ($url in $testUrls) {
+            try {
+                Write-Host "Trying test file from: $url" -ForegroundColor Gray
+                $startTime = Get-Date
 
-            $duration = ($endTime - $startTime).TotalSeconds
-            if ($duration -gt 0) {
-                $speed = [math]::Round(10 / $duration, 2)
-                Write-Host "Approximate download speed: $speed MB/s" -ForegroundColor Green
-            } else {
-                Write-Host "Test completed too quickly to measure accurately" -ForegroundColor Yellow
+                Invoke-WebRequest -Uri $url -OutFile $null -PassThru -UseBasicParsing -TimeoutSec 30
+                
+                $endTime = Get-Date
+                $duration = ($endTime - $startTime).TotalSeconds
+
+                if ($duration -gt 0) {
+                    $speed = [math]::Round($testFileSizeMB / $duration, 2)
+                    Write-Host "Approximate download speed: $speed MB/s" -ForegroundColor Green
+                } else {
+                    Write-Host "Test completed too quickly to measure accurately" -ForegroundColor Yellow
+                }
+                $success = $true
+                break # Exit loop on success
+            } catch {
+                Write-Host "  Failed to download from $url. Trying next source..." -ForegroundColor Yellow
             }
-        } catch {
-            Write-Host "Speed test failed: $($_.Exception.Message)" -ForegroundColor Red
+        }
+
+        if (-not $success) {
+            Write-Host "Speed test failed after trying all available sources." -ForegroundColor Red
             Write-Host "You can try online speed tests like speedtest.net" -ForegroundColor Yellow
         }
     }

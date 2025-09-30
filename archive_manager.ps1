@@ -9,6 +9,8 @@ param(
     [string[]]$Files
 )
 
+$ErrorActionPreference = 'Stop'
+
 switch ($Action.ToLower()) {
     "create" {
         if (-not $ArchiveName -or -not $Files) {
@@ -45,7 +47,7 @@ switch ($Action.ToLower()) {
 
                 if (Get-Command 7z -ErrorAction SilentlyContinue) {
                     try {
-                        & 7z a $ArchiveName $Files
+                        & 7z a $ArchiveName @Files
                         Write-Host "7Z archive created: $ArchiveName" -ForegroundColor Green
                     } catch {
                         Write-Host "Failed to create 7Z archive: $($_.Exception.Message)" -ForegroundColor Red

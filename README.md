@@ -1,6 +1,6 @@
 # PowerShell Productivity Scripts Collection
 
-A comprehensive collection of 37 PowerShell scripts designed to boost productivity and streamline daily development workflows. Originally ported from bash scripts, these tools are optimized for Windows PowerShell with native Windows features like toast notifications, Windows APIs, and proper error handling.
+A comprehensive collection of 42 PowerShell scripts designed to boost productivity and streamline daily development workflows. Originally ported from bash scripts, these tools are optimized for Windows PowerShell with native Windows features like toast notifications, Windows APIs, and proper error handling.
 
 ## 🚀 Quick Start
 
@@ -50,10 +50,10 @@ A comprehensive collection of 37 PowerShell scripts designed to boost productivi
   remind "+2h" "Call the dentist"
   ```
 
-- **`break`** (`take_a_break.ps1`) - Health break timer
+- **`takebreak`** (`take_a_break.ps1`) - Health break timer
   ```powershell
-  break 15                    # 15-minute break (default)
-  break 5                     # 5-minute break
+  takebreak 15                    # 15-minute break (default)
+  takebreak 5                     # 5-minute break
   ```
 
 #### **Information & Utilities**
@@ -374,7 +374,7 @@ scriptname --help   # For scripts that support it
 
 ## 📊 Script Statistics
 
-- **Total Scripts**: 37
+- **Total Scripts**: 42
 - **Total Aliases**: 55+
 - **Lines of Code**: 3,000+
 - **Features**: Toast notifications, error handling, progress indicators, file backups, cross-platform compatibility considerations

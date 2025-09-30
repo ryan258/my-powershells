@@ -6,6 +6,8 @@ param(
     [string]$DownloadsPath = "$env:USERPROFILE\Downloads"
 )
 
+$ErrorActionPreference = 'Stop'
+
 if (!(Test-Path $DownloadsPath)) {
     Write-Host "Downloads folder not found: $DownloadsPath" -ForegroundColor Red
     exit 1

@@ -12,6 +12,8 @@ param(
     [string]$Parameter3
 )
 
+$ErrorActionPreference = 'Stop'
+
 switch ($Action.ToLower()) {
     "count" {
         if (-not $Parameter1) {

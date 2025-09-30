@@ -1,0 +1,76 @@
+Based on my comprehensive review, here are the issues I've identified:
+
+  Critical Issues 🔴
+
+  1. Broken Aliases in Profile Reference (Microsoft.PowerShell_profile_reference.txt:75-77)
+
+  Set-Alias -Name todolist "$PSScriptRoot\todo.ps1 list"
+  Set-Alias -Name tododone "$PSScriptRoot\todo.ps1 done"
+  Set-Alias -Name todoadd "$PSScriptRoot\todo.ps1 add"
+  Problem: Set-Alias doesn't support arguments. These aliases won't work.
+  Fix: Replace with functions:
+  function todolist { & "$PSScriptRoot\todo.ps1" list }
+  function tododone { & "$PSScriptRoot\todo.ps1" done $args }
+  function todoadd { & "$PSScriptRoot\todo.ps1" add $args }
+
+  2. Drupal Script Dependency Resolution (drupal-core-dev.ps1:15, drupal-module-dev.ps1:21, drupal-theme-dev.ps1:21)
+
+  $scriptPath = (Get-Command new-drupal-project.ps1).Source
+  Problem: This fails if the script isn't in PATH or if Get-Command can't find it.
+  Fix: Use Join-Path $PSScriptRoot "new-drupal-project.ps1"
+
+  3. Array Expansion in archive_manager.ps1:48
+
+  & 7z a $ArchiveName $Files
+  Problem: $Files is an array but not properly splatted.
+  Fix: & 7z a $ArchiveName @Files
+
+  Medium Issues 🟡
+
+  4. README Script Count Discrepancy
+
+  - README claims 37 scripts
+  - Actual count: 42 scripts
+  - Update README.md:12 and line 376
+
+  5. Hardcoded Path in greeting.ps1:13
+
+  $weatherScript = "$env:USERPROFILE\scripts\my-powershells\weather.ps1"
+  Problem: Not portable if user installs elsewhere
+  Fix: $weatherScript = Join-Path $PSScriptRoot "weather.ps1"
+
+  6. Missing Git Validation in Drupal Scripts
+
+  All three wrapper scripts (drupal-core-dev.ps1, drupal-module-dev.ps1, drupal-theme-dev.ps1) should verify Git is installed before attempting to clone.
+
+  7. Hardcoded Default City in weather.ps1:3
+
+  [string]$City = "Bentonville" - This is specific to one location; consider documenting this needs customization.
+
+  Minor Issues 🟢
+
+  8. Inconsistent Error Handling
+
+  Only some scripts set $ErrorActionPreference = 'Stop'. Consider standardizing this across all scripts for consistent error handling.
+
+  9. Network Speed Test Reliability (network_info.ps1:77-93)
+
+  Uses http://speedtest.tele2.net/10MB.zip which may not always be available. Consider adding fallback URLs.
+
+  10. No Validation for "break" Alias
+
+  The alias takebreak conflicts with PowerShell's break keyword. The README shows break as an alias but it's actually takebreak in the profile.
+
+  Good Practices Found ✅
+
+  - Excellent parameter documentation with .SYNOPSIS blocks
+  - Good use of color-coded output for user feedback
+  - Comprehensive error messages with helpful tips
+  - Toast notification fallbacks
+  - Backup creation before destructive operations
+  - Proper use of robocopy for efficient backups
+
+  Summary
+
+  The project is well-structured and functional, but has 3 critical bugs that will cause failures, 7 medium issues that affect portability/accuracy, and several minor inconsistencies. The       
+  most urgent fixes are the broken aliases in the profile reference file and the Drupal script path resolution.

@@ -30,6 +30,8 @@ param(
     [string]$GitRepo
 )
 
+$ErrorActionPreference = 'Stop'
+
 # --- Verification ---
 Write-Host "Checking for DDEV..." -ForegroundColor Cyan
 $ddevCheck = Get-Command ddev -ErrorAction SilentlyContinue
@@ -38,6 +40,14 @@ if (-not $ddevCheck) {
     exit 1
 }
 Write-Host "DDEV found." -ForegroundColor Green
+
+Write-Host "Checking for Git..." -ForegroundColor Cyan
+$gitCheck = Get-Command git -ErrorAction SilentlyContinue
+if (-not $gitCheck) {
+    Write-Host "Git command not found. Please ensure Git is installed and accessible in your PATH." -ForegroundColor Red
+    exit 1
+}
+Write-Host "Git found." -ForegroundColor Green
 
 # --- Main Logic ---
 $projectPath = Join-Path (Get-Location) $ProjectName

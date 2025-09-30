@@ -72,9 +72,9 @@ $env:Path = "$PSScriptRoot;" + $env:Path
 
 # Task & Time Management
 Set-Alias -Name todo "$PSScriptRoot\todo.ps1"
-Set-Alias -Name todolist "$PSScriptRoot\todo.ps1 list"
-Set-Alias -Name tododone "$PSScriptRoot\todo.ps1 done"
-Set-Alias -Name todoadd "$PSScriptRoot\todo.ps1 add"
+function todolist { & "$PSScriptRoot\todo.ps1" list }
+function tododone { & "$PSScriptRoot\todo.ps1" done $args }
+function todoadd { & "$PSScriptRoot\todo.ps1" add $args }
 Set-Alias -Name journal "$PSScriptRoot\journal.ps1"
 Set-Alias -Name j "$PSScriptRoot\journal.ps1"
 Set-Alias -Name memo "$PSScriptRoot\memo.ps1"

@@ -18,6 +18,6 @@ $moduleRepo = "https://git.drupalcode.org/project/$ModuleName.git"
 Write-Host "Setting up environment for Drupal module: $ModuleName..." -ForegroundColor Yellow
 
 # Get the path to the main script
-$scriptPath = (Get-Command new-drupal-project.ps1).Source
+$scriptPath = "$PSScriptRoot\new-drupal-project.ps1"
 
 & $scriptPath -ProjectName $ModuleName -GitRepo $moduleRepo

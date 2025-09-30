@@ -1,3 +1,5 @@
+$ErrorActionPreference = 'Stop'
+
 $projectName = Read-Host "What is the name of your new project?"
 
 if ([string]::IsNullOrWhiteSpace($projectName)) {

@@ -10,7 +10,7 @@ if ($hour -lt 12) {
 
 Write-Host "Good $part, $env:USERNAME." -ForegroundColor Green
 
-$weatherScript = "$env:USERPROFILE\scripts\my-powershells\weather.ps1"
+$weatherScript = Join-Path $PSScriptRoot "weather.ps1"
 if (Test-Path $weatherScript) {
     try {
         & $weatherScript

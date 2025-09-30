@@ -1,3 +1,5 @@
+$ErrorActionPreference = 'Stop'
+
 $projectName = Read-Host "Enter your Python project name"
 
 if ([string]::IsNullOrWhiteSpace($projectName)) {
