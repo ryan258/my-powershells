@@ -1,0 +1,144 @@
+Set-Alias node "$env:NVM_SYMLINK\node.exe"
+Set-Alias npm "$env:NVM_SYMLINK\npm.cmd"
+Set-Alias gemini "$env:APPDATA\npm\gemini.cmd"
+
+# Navigation ----------------------------------------------------------------
+function .. { Set-Location .. }
+function ... { Set-Location ../.. }
+function .... { Set-Location ../../.. }
+
+Set-Alias ll Get-ChildItem
+function la { Get-ChildItem -Force }
+function l { Get-ChildItem }
+function lt { Get-ChildItem | Sort-Object LastWriteTime }
+function lh { Get-ChildItem | Format-Table Name, Length, LastWriteTime }
+
+function here { Get-ChildItem -Force }
+function tree { Get-ChildItem -Recurse -Directory | Select-Object -First 20 }
+function newest { Get-ChildItem | Sort-Object LastWriteTime -Descending | Select-Object -First 10 }
+function biggest { Get-ChildItem | Sort-Object Length -Descending | Select-Object -First 10 }
+function count { (Get-ChildItem).Count }
+
+function downloads { Set-Location "$env:USERPROFILE\Downloads" }
+function down { downloads }
+function documents { Set-Location "$env:USERPROFILE\Documents" }
+function docs { documents }
+function desktop { Set-Location "$env:USERPROFILE\Desktop" }
+function desk { desktop }
+function home { Set-Location $env:USERPROFILE }
+
+# System management ---------------------------------------------------------
+function update { winget upgrade --all }
+function myip { Invoke-RestMethod -Uri "http://ifconfig.me/ip" }
+function localip { Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -ne "Loopback Pseudo-Interface 1"} }
+function mem { Get-WmiObject -Class Win32_OperatingSystem | Select-Object TotalVisibleMemorySize, FreePhysicalMemory }
+function cpu { Get-Process | Sort-Object CPU -Descending | Select-Object -First 10 }
+function psg { param($name) Get-Process | Where-Object {$_.Name -like "*$name*"} }
+
+function ff { param($name) Get-ChildItem -Recurse -Name "*$name*" }
+function du { param($path=".") Get-ChildItem $path -Recurse | Measure-Object -Property Length -Sum }
+function df { Get-WmiObject -Class Win32_LogicalDisk | Select-Object DeviceID, @{Name="Size(GB)";Expression={[math]::Round($_.Size/1GB,2)}}, @{Name="FreeSpace(GB)";Expression={[math]::Round($_.FreeSpace/1GB,2)}} }
+function diskspace { df }
+function ping { param($target) Test-Connection $target -Count 5 }
+function flushdns { ipconfig /flushdns }
+
+function c { Clear-Host }
+function cls { Clear-Host }
+function now { Get-Date }
+function timestamp { Get-Date -Format "yyyyMMdd_HHmmss" }
+
+# Git (these work the same) ------------------------------------------------
+function gs { git status }
+function ga { git add $args }
+function gaa { git add . }
+function gc { git commit -m $args }
+function gp { git push }
+function gl { git pull }
+function gd { git diff }
+function gb { git branch }
+function gco { git checkout $args }
+function glog { git log --oneline }
+
+# --- Define the location of your new PowerShell scripts ---
+$PSScriptRoot = "$env:USERPROFILE\scripts\my-powershells"
+
+# --- Add your scripts directory to the PATH ---
+$env:Path = "$PSScriptRoot;" + $env:Path
+
+
+# =============================================================================
+# CORE PRODUCTIVITY SCRIPTS (New Aliases)
+# =============================================================================
+
+# Task & Time Management
+Set-Alias -Name todo "$PSScriptRoot\todo.ps1"
+Set-Alias -Name todolist "$PSScriptRoot\todo.ps1 list"
+Set-Alias -Name tododone "$PSScriptRoot\todo.ps1 done"
+Set-Alias -Name todoadd "$PSScriptRoot\todo.ps1 add"
+Set-Alias -Name journal "$PSScriptRoot\journal.ps1"
+Set-Alias -Name j "$PSScriptRoot\journal.ps1"
+Set-Alias -Name memo "$PSScriptRoot\memo.ps1"
+Set-Alias -Name note "$PSScriptRoot\quick_note.ps1"
+Set-Alias -Name remind "$PSScriptRoot\remind_me.ps1"
+Set-Alias -Name break "$PSScriptRoot\take_a_break.ps1"
+
+# Information & Utilities
+Set-Alias -Name weather "$PSScriptRoot\weather.ps1"
+Set-Alias -Name findtext "$PSScriptRoot\findtext.ps1"
+Set-Alias -Name cheatsheet "$PSScriptRoot\cheatsheet.ps1"
+
+# File & System Management
+Set-Alias -Name findbig "$PSScriptRoot\findbig.ps1"
+Set-Alias -Name organize "$PSScriptRoot\file_organizer.ps1"
+Set-Alias -Name unpack "$PSScriptRoot\unpacker.ps1"
+Set-Alias -Name backup "$PSScriptRoot\backup_project.ps1"
+
+# Daily Routine Scripts
+Set-Alias -Name startday "$PSScriptRoot\startday.ps1"
+Set-Alias -Name goodevening "$PSScriptRoot\goodevening.ps1"
+Set-Alias -Name greeting "$PSScriptRoot\greeting.ps1"
+
+# =============================================================================
+# ADDITIONAL PRODUCTIVITY SCRIPTS (New Aliases)
+# =============================================================================
+
+# System & Network Information
+Set-Alias -Name sysinfo "$PSScriptRoot\system_info.ps1"
+Set-Alias -Name netinfo "$PSScriptRoot\network_info.ps1"
+
+# File & Directory Management
+Set-Alias -Name duplicates "$PSScriptRoot\duplicate_finder.ps1"
+Set-Alias -Name tidydown "$PSScriptRoot\tidy_downloads.ps1"
+Set-Alias -Name openfile "$PSScriptRoot\open_file.ps1"
+Set-Alias -Name goto "$PSScriptRoot\goto.ps1"
+Set-Alias -Name recentdirs "$PSScriptRoot\recent_dirs.ps1"
+
+# Application & Process Management
+Set-Alias -Name app "$PSScriptRoot\app_launcher.ps1"
+Set-Alias -Name processes "$PSScriptRoot\process_manager.ps1"
+
+# Clipboard & Workspace Management
+Set-Alias -Name clip "$PSScriptRoot\clipboard_manager.ps1"
+Set-Alias -Name workspace "$PSScriptRoot\workspace_manager.ps1"
+
+# Command Execution & Monitoring
+Set-Alias -Name done "$PSScriptRoot\done.ps1"
+
+# Weekly Review & Reporting
+Set-Alias -Name weekreview "$PSScriptRoot\week_in_review.ps1"
+
+# Development & Project Management
+Set-Alias -Name dev "$PSScriptRoot\dev_shortcuts.ps1"
+Set-Alias -Name newproject "$PSScriptRoot\start_project.ps1"
+Set-Alias -Name newpy "$PSScriptRoot\mkproject_py.ps1"
+Set-Alias -Name progress "$PSScriptRoot\my_progress.ps1"
+
+# Text & Archive Processing
+Set-Alias -Name textproc "$PSScriptRoot\text_processor.ps1"
+Set-Alias -Name archive "$PSScriptRoot\archive_manager.ps1"
+
+# Media Processing
+Set-Alias -Name media "$PSScriptRoot\media_converter.ps1"
+
+# System Utilities
+Set-Alias -Name battery "$PSScriptRoot\battery_check.ps1"
