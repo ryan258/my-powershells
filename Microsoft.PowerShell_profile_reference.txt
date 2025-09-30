@@ -17,7 +17,7 @@ function here { Get-ChildItem -Force }
 function tree { Get-ChildItem -Recurse -Directory | Select-Object -First 20 }
 function newest { Get-ChildItem | Sort-Object LastWriteTime -Descending | Select-Object -First 10 }
 function biggest { Get-ChildItem | Sort-Object Length -Descending | Select-Object -First 10 }
-function count { (Get-ChildItem).Count }
+function fcount { (Get-ChildItem).Count }
 
 function downloads { Set-Location "$env:USERPROFILE\Downloads" }
 function down { downloads }
@@ -39,7 +39,7 @@ function ff { param($name) Get-ChildItem -Recurse -Name "*$name*" }
 function du { param($path=".") Get-ChildItem $path -Recurse | Measure-Object -Property Length -Sum }
 function df { Get-WmiObject -Class Win32_LogicalDisk | Select-Object DeviceID, @{Name="Size(GB)";Expression={[math]::Round($_.Size/1GB,2)}}, @{Name="FreeSpace(GB)";Expression={[math]::Round($_.FreeSpace/1GB,2)}} }
 function diskspace { df }
-function ping { param($target) Test-Connection $target -Count 5 }
+function psping { param($target) Test-Connection $target -Count 5 }
 function flushdns { ipconfig /flushdns }
 
 function c { Clear-Host }
@@ -80,7 +80,7 @@ Set-Alias -Name j "$PSScriptRoot\journal.ps1"
 Set-Alias -Name memo "$PSScriptRoot\memo.ps1"
 Set-Alias -Name note "$PSScriptRoot\quick_note.ps1"
 Set-Alias -Name remind "$PSScriptRoot\remind_me.ps1"
-Set-Alias -Name break "$PSScriptRoot\take_a_break.ps1"
+Set-Alias -Name takebreak "$PSScriptRoot\take_a_break.ps1"
 
 # Information & Utilities
 Set-Alias -Name weather "$PSScriptRoot\weather.ps1"

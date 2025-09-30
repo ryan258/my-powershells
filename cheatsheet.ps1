@@ -19,7 +19,7 @@ Write-Host "  note add 'detailed note'# Advanced notes with search" -ForegroundC
 Write-Host ""
 Write-Host "Time Management:" -ForegroundColor Yellow
 Write-Host "  remind '+30m' 'message' # Set reminder in 30 minutes" -ForegroundColor White
-Write-Host "  break 15                # Take 15-minute health break" -ForegroundColor White
+Write-Host "  takebreak 15            # Take 15-minute health break" -ForegroundColor White
 Write-Host ""
 
 Write-Host "=== SYSTEM & NETWORK ===" -ForegroundColor Green
@@ -174,7 +174,7 @@ Write-Host ""
 Write-Host "File Info:" -ForegroundColor Yellow
 Write-Host "  newest                  # 10 newest files" -ForegroundColor White
 Write-Host "  biggest                 # 10 largest files" -ForegroundColor White
-Write-Host "  count                   # Count files in directory" -ForegroundColor White
+Write-Host "  fcount                  # Count files in directory" -ForegroundColor White
 Write-Host ""
 
 Write-Host "===============================================" -ForegroundColor Cyan
