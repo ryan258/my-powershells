@@ -104,6 +104,11 @@ Here is a high-level overview of the scripts, grouped by their purpose.
 *   **`start_project`**: Creates a generic project structure for any language.
 *   **`dev_shortcuts`**: A collection of useful developer commands, like starting a local server or pretty-printing JSON.
 *   **`my_progress`**: If you're in a Git repository, this shows your recent commit activity.
+*   **`new-drupal-project`**: A powerful script to fully automate the setup of a local Drupal environment using DDEV.
+*   **`drupal-core-dev`**: A helper script to set up a Drupal core contribution environment.
+*   **`drupal-module-dev`**: A helper script to set up a module contribution environment.
+*   **`drupal-theme-dev`**: A helper script to set up a theme contribution environment.
+*   **`new-headless-drupal`**: A helper script to set up a headless Drupal backend.
 
 #### System & Network
 
