@@ -9,7 +9,7 @@ A comprehensive collection of 42 PowerShell scripts designed to boost productivi
 3. **Restart PowerShell** or run `. $PROFILE` to load the new aliases
 4. **Start using** any of the 55+ aliases immediately!
 
-## 📋 Complete Script Collection (37 Scripts)
+## 📋 Complete Script Collection (42 Scripts)
 
 ### 🎯 **Core Productivity (16 scripts)**
 
@@ -106,7 +106,7 @@ A comprehensive collection of 42 PowerShell scripts designed to boost productivi
 - **`goodevening`** (`goodevening.ps1`) - Evening wrap-up
 - **`greeting`** (`greeting.ps1`) - Context-aware greeting
 
-### 🖥️ **System & Network (8 scripts)**
+### 🖥️ **System & Network (5 scripts)**
 
 - **`sysinfo`** (`system_info.ps1`) - Comprehensive system information
   ```powershell
@@ -145,7 +145,7 @@ A comprehensive collection of 42 PowerShell scripts designed to boost productivi
   battery                    # Show battery status and tips
   ```
 
-### 📁 **File & Navigation (6 scripts)**
+### 📁 **File & Navigation (4 scripts)**
 
 - **`tidydown`** (`tidy_downloads.ps1`) - Organize and clean downloads folder
   ```powershell
@@ -174,8 +174,9 @@ A comprehensive collection of 42 PowerShell scripts designed to boost productivi
   recentdirs add           # Add current directory to history
   ```
 
-### 💻 **Development Tools (7 scripts)**
+### 💻 **Development Tools (12 scripts)**
 
+#### **General Development**
 - **`dev`** (`dev_shortcuts.ps1`) - Development workflow shortcuts
   ```powershell
   dev server               # Start development server (port 8000)
@@ -228,6 +229,33 @@ A comprehensive collection of 42 PowerShell scripts designed to boost productivi
   media video_compress video.mp4     # Compress video file
   ```
 
+#### **Drupal Development**
+- **`new-drupal`** (`new-drupal-project.ps1`) - Create new Drupal 11 projects with DDEV
+  ```powershell
+  new-drupal my-project           # Create new Drupal project
+  new-drupal my-site https://github.com/user/repo.git  # Clone and setup
+  ```
+
+- **`new-drupal-headless`** (`new-headless-drupal.ps1`) - Setup headless Drupal backend
+  ```powershell
+  new-drupal-headless my-api      # Create headless Drupal project
+  ```
+
+- **`new-drupal-core`** (`drupal-core-dev.ps1`) - Setup Drupal core contribution environment
+  ```powershell
+  new-drupal-core                 # Clone and setup Drupal core
+  ```
+
+- **`new-drupal-module`** (`drupal-module-dev.ps1`) - Setup module contribution environment
+  ```powershell
+  new-drupal-module token         # Setup Token module for contribution
+  ```
+
+- **`new-drupal-theme`** (`drupal-theme-dev.ps1`) - Setup theme contribution environment
+  ```powershell
+  new-drupal-theme bootstrap5     # Setup Bootstrap5 theme for contribution
+  ```
+
 ### 🔧 **Workspace & Utilities (5 scripts)**
 
 - **`app`** (`app_launcher.ps1`) - Application launcher with favorites
@@ -275,6 +303,7 @@ A comprehensive collection of 42 PowerShell scripts designed to boost productivi
 - **Windows PowerShell 5.1+** or **PowerShell 7+**
 - **Git** (for some development scripts)
 - **Optional tools** for enhanced functionality:
+  - **DDEV** (for Drupal development): `winget install DDEV.DDEV`
   - **FFmpeg** (for media conversion): `winget install ffmpeg`
   - **ImageMagick** (for image processing): `winget install ImageMagick.ImageMagick`
   - **7-Zip** (for archive management): `winget install 7zip.7zip`
