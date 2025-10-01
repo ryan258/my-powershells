@@ -10,30 +10,42 @@ We will use **DDEV**, a professional, open-source tool that abstracts away the c
 
 ## The Easiest Way: Intention-Driven Setup
 
-With the new automation scripts, setting up any type of Drupal project is now a single command run from your standard PowerShell terminal. These commands match your specific intention, whether you are starting a new project or contributing to an existing one.
+With the new automation scripts, setting up any type of Drupal project is now a single command. These commands match your specific intention, whether you are starting a new project or contributing to an existing one.
+
+**Note:** Since DDEV runs in WSL, run these commands from your WSL terminal (type `wsl` to enter).
+
+**Important:** Projects are created in your current directory. Navigate to where you want your Drupal projects before running these commands (e.g., `cd ~/projects` or `cd /mnt/c/Users/ryanl/projects`).
 
 ### To Start a New Drupal Site
-```powershell
-new-drupal -ProjectName my-new-site
+```bash
+# Navigate to your projects directory
+cd ~/projects
+
+# Run the script
+pwsh /mnt/c/Users/ryanl/scripts/my-powershells/new-drupal-project.ps1 -ProjectName my-new-site
 ```
 
 ### To Start a Headless Project
-```powershell
-new-drupal-headless my-api-backend
+```bash
+cd ~/projects
+pwsh /mnt/c/Users/ryanl/scripts/my-powershells/new-headless-drupal.ps1 -ProjectName my-api-backend
 ```
 
 ### To Contribute to Drupal Core
-```powershell
-new-drupal-core
+```bash
+cd ~/projects
+pwsh /mnt/c/Users/ryanl/scripts/my-powershells/drupal-core-dev.ps1
 ```
 
 ### To Contribute to a Module or Theme
-```powershell
+```bash
+cd ~/projects
+
 # To set up a module (e.g., the Token module)
-new-drupal-module token
+pwsh /mnt/c/Users/ryanl/scripts/my-powershells/drupal-module-dev.ps1 -ModuleName token
 
 # To set up a theme (e.g., the Bootstrap5 theme)
-new-drupal-theme bootstrap5
+pwsh /mnt/c/Users/ryanl/scripts/my-powershells/drupal-theme-dev.ps1 -ThemeName bootstrap5
 ```
 
 ---
@@ -83,9 +95,12 @@ This workflow is used by the `new-drupal` and `new-drupal-headless` aliases.
 
 1.  **Create Project Folder**: A directory for the project is created.
 2.  **Configure DDEV**: `ddev config` is run to prepare the environment.
-3.  **Install Drupal Scaffold**: `ddev composer create` downloads the recommended Drupal project structure.
-4.  **Start DDEV & Install Site**: The environment is started, and `ddev drush site:install` creates the database and runs the installer.
-5.  **Launch Site**: The new site is opened in the browser.
+3.  **Start DDEV**: The environment is started (this may take a minute on first run).
+4.  **Install Drupal Scaffold**: `ddev composer create` downloads the recommended Drupal project structure.
+5.  **Install Drush**: `ddev composer require drush/drush` installs the Drush command-line tool.
+6.  **Install Developer Tools**: `ddev composer require` installs Devel, Admin Toolbar, and Coder modules for development.
+7.  **Install Site**: `ddev drush site:install` creates the database and runs the Drupal installer with admin/admin credentials.
+8.  **Launch Site**: The new site is opened in the browser.
 
 ### Workflow for **Contributing** to Drupal
 
