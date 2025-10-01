@@ -136,13 +136,13 @@ function Setup-NewSite {
     Push-Location $ProjectPath
     try {
         Write-Host "(1/5) Configuring DDEV" -ForegroundColor Cyan
-        ddev config --project-type=drupal11 --docroot=web --create-docroot | Out-Null
+        ddev config --project-type=drupal11 --docroot=web | Out-Null
 
-        Write-Host "(2/5) Installing Drupal scaffold with Composer" -ForegroundColor Cyan
+        Write-Host "(2/5) Starting DDEV (this may take a minute...)" -ForegroundColor Cyan
+        ddev start --skip-confirmation | Out-Null
+
+        Write-Host "(3/5) Installing Drupal scaffold with Composer" -ForegroundColor Cyan
         ddev composer create drupal/recommended-project . --no-progress | Out-Null
-
-        Write-Host "(3/5) Starting DDEV" -ForegroundColor Cyan
-        ddev start | Out-Null
 
         if (-not $SkipSiteInstall) {
             Write-Host "(4/5) Installing Drupal via Drush" -ForegroundColor Cyan
@@ -185,8 +185,8 @@ function Setup-ExistingProject {
         Write-Host "(1/4) Configuring DDEV" -ForegroundColor Cyan
         ddev config --project-type=drupal11 $docrootArg | Out-Null
 
-        Write-Host "(2/4) Starting DDEV" -ForegroundColor Cyan
-        ddev start | Out-Null
+        Write-Host "(2/4) Starting DDEV (this may take a minute...)" -ForegroundColor Cyan
+        ddev start --skip-confirmation | Out-Null
 
         $composerFile = Join-Path $projectRoot 'composer.json'
         if (Test-Path $composerFile) {
@@ -269,7 +269,7 @@ function Setup-ContributionSandbox {
             }
 
             try {
-                ddev composer require "$packageName:@dev" --no-progress | Out-Null
+                ddev composer require "${packageName}:@dev" --no-progress | Out-Null
                 Write-Host "Composer dependencies for '$packageName' are linked." -ForegroundColor Green
             } catch {
                 Write-Host "Failed to install Composer dependencies for '$packageName': $($_.Exception.Message)" -ForegroundColor Yellow

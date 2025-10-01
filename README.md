@@ -4,10 +4,12 @@ A comprehensive collection of 42 PowerShell scripts designed to boost productivi
 
 ## 🚀 Quick Start
 
-1. **Clone or download** this repository to `$env:USERPROFILE\scripts\my-powershells`
-2. **Update your PowerShell profile** by copying the contents of `Microsoft.PowerShell_profile_reference.txt`
-3. **Restart PowerShell** or run `. $PROFILE` to load the new aliases
-4. **Start using** any of the 55+ aliases immediately!
+1. **Clone or download** this repository to a location on your Windows filesystem, for example: `$env:USERPROFILE\scripts\my-powershells`.
+2. **Update your PowerShell profile** by copying the contents of `Microsoft.PowerShell_profile_reference.txt`. This will set up aliases for most scripts.
+3. **Restart PowerShell** or run `. $PROFILE` to load the new aliases.
+4. **Start using** the aliases immediately!
+
+**Important Note on Drupal Workflow:** The Drupal-related scripts (`new-drupal-*`) and the `ddev` command must be run from within a **WSL/Ubuntu terminal**, not from PowerShell.
 
 ## 📋 Complete Script Collection (42 Scripts)
 
@@ -230,38 +232,42 @@ A comprehensive collection of 42 PowerShell scripts designed to boost productivi
   ```
 
 #### **Drupal Development**
-This suite of scripts automates the setup of various Drupal development environments using DDEV. The core logic resides in `new-drupal-project.ps1`, with convenient wrappers for common tasks.
+This suite of scripts automates the setup of various Drupal development environments using DDEV. **This entire workflow must be run from a WSL/Ubuntu terminal.**
 
-- **`new-drupal`** (`new-drupal-project.ps1`) - The main script for creating new Drupal projects. It supports multiple workflows via parameters.
-  ```powershell
+First, navigate to the directory where you cloned the scripts, for example:
+```bash
+cd /mnt/c/Users/YourUserName/scripts/my-powershells
+```
+
+Then, execute the desired script using `pwsh`:
+
+- **`new-drupal-project.ps1`** - The main script for creating new Drupal projects.
+  ```bash
   # Create a brand-new standard Drupal site
-  new-drupal -ProjectName my-new-site
+  pwsh ./new-drupal-project.ps1 -ProjectName my-new-site
 
   # Create a contribution sandbox for the Token module with dependency linking
-  new-drupal -ProjectName token -GitRepo https://git.drupalcode.org/project/token.git -SetupType module -LinkExtensionDependencies
-  
-  # Clone and bootstrap an existing Drupal site from a private repository
-  new-drupal -ProjectName my-existing-site -GitRepo git@github.com:user/my-site.git -SkipSiteInstall
+  pwsh ./new-drupal-project.ps1 -ProjectName token -GitRepo https://git.drupalcode.org/project/token.git -SetupType module -LinkExtensionDependencies
   ```
 
-- **`new-drupal-core`** (`drupal-core-dev.ps1`) - A wrapper to quickly set up a sandbox for contributing to Drupal Core.
-  ```powershell
-  new-drupal-core
+- **`drupal-core-dev.ps1`** - A wrapper to quickly set up a sandbox for contributing to Drupal Core.
+  ```bash
+  pwsh ./drupal-core-dev.ps1
   ```
 
-- **`new-drupal-module`** (`drupal-module-dev.ps1`) - A wrapper for setting up a contribution environment for a specific module.
-  ```powershell
-  new-drupal-module token
+- **`drupal-module-dev.ps1`** - A wrapper for setting up a contribution environment for a specific module.
+  ```bash
+  pwsh ./drupal-module-dev.ps1 token
   ```
 
-- **`new-drupal-theme`** (`drupal-theme-dev.ps1`) - A wrapper for setting up a contribution environment for a specific theme.
-  ```powershell
-  new-drupal-theme bootstrap5
+- **`drupal-theme-dev.ps1`** - A wrapper for setting up a contribution environment for a specific theme.
+  ```bash
+  pwsh ./drupal-theme-dev.ps1 bootstrap5
   ```
 
-- **`new-drupal-headless`** (`new-headless-drupal.ps1`) - A wrapper that sets up a standard Drupal site and provides instructions for using it as a headless backend.
-  ```powershell
-  new-drupal-headless my-headless-backend
+- **`new-headless-drupal.ps1`** - A wrapper that sets up a standard Drupal site for use as a headless backend.
+  ```bash
+  pwsh ./new-headless-drupal.ps1 my-headless-backend
   ```
 
 **Key Features & Parameters:**
@@ -316,10 +322,27 @@ This suite of scripts automates the setup of various Drupal development environm
 ## 🛠️ Installation & Setup
 
 ### Prerequisites
-- **Windows PowerShell 5.1+** or **PowerShell 7+**
-- **Git** (for some development scripts)
-- **Optional tools** for enhanced functionality:
-  - **DDEV** (for Drupal development): `winget install DDEV.DDEV`
+- **Windows 11** with **WSL2 (Windows Subsystem for Linux)**.
+  - To install, open PowerShell as an **administrator** and run `wsl --install`, then restart.
+- **PowerShell 7+** is recommended.
+
+### Dependency Installation
+The scripts require certain external command-line tools for full functionality.
+
+#### **Required for Drupal Development**
+The entire Drupal workflow runs inside WSL. You will need:
+- **DDEV**: Installed *inside WSL*.
+  1. Open your WSL/Ubuntu terminal.
+  2. Run: `curl -fsSL https://raw.githubusercontent.com/ddev/ddev/master/scripts/install_ddev.sh | bash`
+- **Git**: Also required inside WSL.
+  1. Open your WSL/Ubuntu terminal.
+  2. Run: `sudo apt update && sudo apt install git -y`
+- **PowerShell (`pwsh`)**: The scripts themselves are PowerShell scripts, so you need `pwsh` installed in WSL to run them.
+  1. Open your WSL/Ubuntu terminal.
+  2. Run: `sudo snap install powershell --classic`
+
+#### **Optional Tools (for media, archives, etc.)**
+These can be installed on Windows via `winget`:
   - **FFmpeg** (for media conversion): `winget install ffmpeg`
   - **ImageMagick** (for image processing): `winget install ImageMagick.ImageMagick`
   - **7-Zip** (for archive management): `winget install 7zip.7zip`
@@ -420,7 +443,7 @@ scriptname --help   # For scripts that support it
 ## 📊 Script Statistics
 
 - **Total Scripts**: 42
-- **Total Aliases**: 55+
+any of the 50+ aliases immediately!
 - **Lines of Code**: 3,000+
 - **Features**: Toast notifications, error handling, progress indicators, file backups, cross-platform compatibility considerations
 

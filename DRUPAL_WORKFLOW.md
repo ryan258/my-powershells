@@ -6,51 +6,44 @@ This guide is dedicated to creating a stable, repeatable, and stress-free develo
 
 We will use **DDEV**, a professional, open-source tool that abstracts away the complexities of Docker. It is widely used and highly regarded within the Drupal community, making it a perfect choice for a standardized setup.
 
+> **Workflow Note:** All commands in this guide, including `ddev` and the `new-drupal-*` scripts, must be run from within a **WSL/Ubuntu terminal**, not from PowerShell.
+
 ---
 
 ## The Easiest Way: Intention-Driven Setup
 
-With the new automation scripts, setting up any type of Drupal project is now a single command. These commands match your specific intention, whether you are starting a new project or contributing to an existing one.
+With the new automation scripts, setting up any type of Drupal project is now a single command.
+
+First, navigate to the script directory within your WSL/Ubuntu terminal. The path will be similar to this:
+```bash
+cd /mnt/c/Users/YourUserName/scripts/my-powershells
+```
+
+Then, run the desired script directly:
 
 ### To Start a New Drupal Site
-
-This creates a standard, empty Drupal site, ready for development.
-
-```powershell
-new-drupal -ProjectName <your-project-name>
+```bash
+pwsh ./new-drupal-project.ps1 -ProjectName my-new-site
 ```
-*Example: `new-drupal -ProjectName my-new-site`*
 
 ### To Start a Headless Project
-
-This sets up a new Drupal site and provides guidance for using it as a headless CMS backend.
-
-```powershell
-new-drupal-headless <your-project-name>
+```bash
+pwsh ./new-headless-drupal.ps1 my-api-backend
 ```
-*Example: `new-drupal-headless my-api-backend`*
 
 ### To Contribute to Drupal Core
-
-This creates a local development sandbox with Drupal core cloned and ready for contributions.
-
-```powershell
-new-drupal-core
+```bash
+pwsh ./drupal-core-dev.ps1
 ```
 
 ### To Contribute to a Module or Theme
-
-This creates a full Drupal sandbox, then clones the specified module or theme into it, and can even link its dependencies for you.
-
-```powershell
+```bash
 # To set up a module (e.g., the Token module)
-new-drupal-module token
+pwsh ./drupal-module-dev.ps1 token
 
 # To set up a theme (e.g., the Bootstrap5 theme)
-new-drupal-theme bootstrap5
+pwsh ./drupal-theme-dev.ps1 bootstrap5
 ```
-
-> These aliases are shortcuts for the more detailed, manual steps described later in this document. They are the recommended way to start any new project.
 
 ---
 
@@ -58,32 +51,42 @@ new-drupal-theme bootstrap5
 
 Before you start your first project, you need to set up a few tools on your computer. You only have to do this once.
 
-### 1. Install DDEV
+### 1. Install WSL2 (Windows Subsystem for Linux)
+WSL2 is the foundation of the modern DDEV workflow on Windows. It lets you run a real Linux environment directly inside Windows, giving you the best of both worlds.
 
-DDEV is the core of this workflow. It manages everything for you. The easiest way to install it on Windows is with the `winget` package manager.
-
-Open PowerShell and run:
+Open PowerShell **as an administrator** and run:
 ```powershell
-winget install -e --id DDEV.DDEV
+wsl --install
+```
+This will install WSL and a default Ubuntu distribution. If you already have it installed, it may give a harmless error that it already exists. **Restart your computer** after this step is complete.
+
+### 2. Install DDEV (inside WSL)
+Once WSL is ready, you need to install DDEV inside your new Linux environment.
+
+First, open your Ubuntu terminal by typing `ubuntu` or `wsl` in your Start Menu. Then, run the following command inside the Ubuntu terminal:
+```bash
+curl -fsSL https://raw.githubusercontent.com/ddev/ddev/master/scripts/install_ddev.sh | bash
+```
+After the script finishes, close and reopen your Ubuntu terminal.
+
+### 3. Install Git
+Git is essential for downloading Drupal code. While DDEV can manage it, it's best to have it in your Ubuntu environment. Run this command inside the Ubuntu terminal:
+```bash
+sudo apt update && sudo apt install git -y
 ```
 
-After installation, close and reopen your terminal. DDEV will automatically handle installing **Docker Desktop** if you don't already have it.
-
-### 2. Install Git
-
-Git is essential for downloading Drupal code and contributing back. If you don't have it, you can install it with `winget`:
-
-```powershell
-winget install -e --id Git.Git
+### 4. Install PowerShell for WSL
+The automation scripts are `.ps1` files, so you need to install PowerShell inside your Ubuntu environment to run them. On Ubuntu, the recommended way is via `snap`:
+```bash
+sudo snap install powershell --classic
 ```
 
-### 3. (Optional) Install a Code Editor
-
-If you don't have one already, Visual Studio Code is an excellent choice for Drupal development.
-
+### 5. (Optional) Install a Code Editor
+If you don't have one already, **Visual Studio Code** is highly recommended as it integrates seamlessly with WSL.
 ```powershell
 winget install -e --id Microsoft.VisualStudioCode
 ```
+You can then open your projects from within the WSL terminal using `code .`.
 
 ---
 

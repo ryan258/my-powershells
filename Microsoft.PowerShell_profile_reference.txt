@@ -143,12 +143,3 @@ Set-Alias -Name media "$PSScriptRoot\media_converter.ps1"
 # System Utilities
 Set-Alias -Name battery "$PSScriptRoot\battery_check.ps1"
 
-# =============================================================================
-# DRUPAL DEVELOPMENT WORKFLOW (New Aliases)
-# =============================================================================
-
-Set-Alias -Name new-drupal "$PSScriptRoot\new-drupal-project.ps1"
-Set-Alias -Name new-drupal-core "$PSScriptRoot\drupal-core-dev.ps1"
-Set-Alias -Name new-drupal-module "$PSScriptRoot\drupal-module-dev.ps1"
-Set-Alias -Name new-drupal-theme "$PSScriptRoot\drupal-theme-dev.ps1"
-Set-Alias -Name new-drupal-headless "$PSScriptRoot\new-headless-drupal.ps1"
