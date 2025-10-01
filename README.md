@@ -4,12 +4,10 @@ A comprehensive collection of 42 PowerShell scripts designed to boost productivi
 
 ## 🚀 Quick Start
 
-1. **Clone or download** this repository to a location on your Windows filesystem, for example: `$env:USERPROFILE\scripts\my-powershells`.
-2. **Update your PowerShell profile** by copying the contents of `Microsoft.PowerShell_profile_reference.txt`. This will set up aliases for most scripts.
+1. **Clone or download** this repository to `$env:USERPROFILE\scripts\my-powershells`.
+2. **Update your PowerShell profile** by copying the contents of `Microsoft.PowerShell_profile_reference.txt`.
 3. **Restart PowerShell** or run `. $PROFILE` to load the new aliases.
-4. **Start using** the aliases immediately!
-
-**Important Note on Drupal Workflow:** The Drupal-related scripts (`new-drupal-*`) and the `ddev` command must be run from within a **WSL/Ubuntu terminal**, not from PowerShell.
+4. **Start using** any of the 55+ aliases immediately!
 
 ## 📋 Complete Script Collection (42 Scripts)
 
@@ -232,45 +230,39 @@ A comprehensive collection of 42 PowerShell scripts designed to boost productivi
   ```
 
 #### **Drupal Development**
-This suite of scripts automates the setup of various Drupal development environments using DDEV. **This entire workflow must be run from a WSL/Ubuntu terminal.**
+This suite of scripts automates the setup of various Drupal development environments using DDEV. Thanks to the new WSL-based functions, you can run these simple commands directly from PowerShell.
 
-First, navigate to the directory where you cloned the scripts, for example:
-```bash
-cd /mnt/c/Users/YourUserName/scripts/my-powershells
-```
-
-Then, execute the desired script using `pwsh`:
-
-- **`new-drupal-project.ps1`** - The main script for creating new Drupal projects.
-  ```bash
+- **`new-drupal`** - The main function for creating new Drupal projects.
+  ```powershell
   # Create a brand-new standard Drupal site
-  pwsh ./new-drupal-project.ps1 -ProjectName my-new-site
+  new-drupal -ProjectName my-new-site
 
-  # Create a contribution sandbox for the Token module with dependency linking
-  pwsh ./new-drupal-project.ps1 -ProjectName token -GitRepo https://git.drupalcode.org/project/token.git -SetupType module -LinkExtensionDependencies
+  # Create a contribution sandbox for the Token module
+  new-drupal -ProjectName token -GitRepo https://git.drupalcode.org/project/token.git -SetupType module -LinkExtensionDependencies
   ```
 
-- **`drupal-core-dev.ps1`** - A wrapper to quickly set up a sandbox for contributing to Drupal Core.
-  ```bash
-  pwsh ./drupal-core-dev.ps1
+- **`new-drupal-core`** - A wrapper to quickly set up a sandbox for contributing to Drupal Core.
+  ```powershell
+  new-drupal-core
   ```
 
-- **`drupal-module-dev.ps1`** - A wrapper for setting up a contribution environment for a specific module.
-  ```bash
-  pwsh ./drupal-module-dev.ps1 token
+- **`new-drupal-module`** - A wrapper for setting up a contribution environment for a specific module.
+  ```powershell
+  new-drupal-module token
   ```
 
-- **`drupal-theme-dev.ps1`** - A wrapper for setting up a contribution environment for a specific theme.
-  ```bash
-  pwsh ./drupal-theme-dev.ps1 bootstrap5
+- **`new-drupal-theme`** - A wrapper for setting up a contribution environment for a specific theme.
+  ```powershell
+  new-drupal-theme bootstrap5
   ```
 
-- **`new-headless-drupal.ps1`** - A wrapper that sets up a standard Drupal site for use as a headless backend.
-  ```bash
-  pwsh ./new-headless-drupal.ps1 my-headless-backend
+- **`new-drupal-headless`** - A wrapper that sets up a standard Drupal site for use as a headless backend.
+  ```powershell
+  new-drupal-headless my-headless-backend
   ```
 
 **Key Features & Parameters:**
+- **Includes Developer Tools**: Automatically installs `Drush`, `Devel`, `Admin Toolbar`, and `Coder` for a better out-of-the-box development experience.
 - **`-SetupType`**: Controls the workflow. Can be `site` (default), `core`, `module`, or `theme`.
 - **`-GitRepo`**: The Git URL to clone for an existing project or for a contribution sandbox.
 - **`-LinkExtensionDependencies`**: For `module` and `theme` setups, this automatically links the extension's `composer.json` and installs its PHP dependencies.
@@ -323,23 +315,14 @@ Then, execute the desired script using `pwsh`:
 
 ### Prerequisites
 - **Windows 11** with **WSL2 (Windows Subsystem for Linux)**.
-  - To install, open PowerShell as an **administrator** and run `wsl --install`, then restart.
-- **PowerShell 7+** is recommended.
+  - To install, open PowerShell as an **administrator** and run `wsl --install`, then restart your computer.
+- **DDEV**: DDEV must be installed within your WSL environment.
+  - Open your WSL/Ubuntu terminal and run: `curl -fsSL https://raw.githubusercontent.com/ddev/ddev/master/scripts/install_ddev.sh | bash`
+- **PowerShell for Linux (`pwsh`)**: The aliases require `pwsh` to be installed inside WSL for the Drupal commands to function.
+  - Open your WSL/Ubuntu terminal and run: `sudo snap install powershell --classic`
+- **Git**: While not strictly required for all scripts, it is highly recommended and is used by many development scripts.
 
-### Dependency Installation
-The scripts require certain external command-line tools for full functionality.
-
-#### **Required for Drupal Development**
-The entire Drupal workflow runs inside WSL. You will need:
-- **DDEV**: Installed *inside WSL*.
-  1. Open your WSL/Ubuntu terminal.
-  2. Run: `curl -fsSL https://raw.githubusercontent.com/ddev/ddev/master/scripts/install_ddev.sh | bash`
-- **Git**: Also required inside WSL.
-  1. Open your WSL/Ubuntu terminal.
-  2. Run: `sudo apt update && sudo apt install git -y`
-- **PowerShell (`pwsh`)**: The scripts themselves are PowerShell scripts, so you need `pwsh` installed in WSL to run them.
-  1. Open your WSL/Ubuntu terminal.
-  2. Run: `sudo snap install powershell --classic`
+#### **Optional Tools (for media, archives, etc.)**
 
 #### **Optional Tools (for media, archives, etc.)**
 These can be installed on Windows via `winget`:

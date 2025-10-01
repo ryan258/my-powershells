@@ -6,43 +6,34 @@ This guide is dedicated to creating a stable, repeatable, and stress-free develo
 
 We will use **DDEV**, a professional, open-source tool that abstracts away the complexities of Docker. It is widely used and highly regarded within the Drupal community, making it a perfect choice for a standardized setup.
 
-> **Workflow Note:** All commands in this guide, including `ddev` and the `new-drupal-*` scripts, must be run from within a **WSL/Ubuntu terminal**, not from PowerShell.
-
 ---
 
 ## The Easiest Way: Intention-Driven Setup
 
-With the new automation scripts, setting up any type of Drupal project is now a single command.
-
-First, navigate to the script directory within your WSL/Ubuntu terminal. The path will be similar to this:
-```bash
-cd /mnt/c/Users/YourUserName/scripts/my-powershells
-```
-
-Then, run the desired script directly:
+With the new automation scripts, setting up any type of Drupal project is now a single command run from your standard PowerShell terminal. These commands match your specific intention, whether you are starting a new project or contributing to an existing one.
 
 ### To Start a New Drupal Site
-```bash
-pwsh ./new-drupal-project.ps1 -ProjectName my-new-site
+```powershell
+new-drupal -ProjectName my-new-site
 ```
 
 ### To Start a Headless Project
-```bash
-pwsh ./new-headless-drupal.ps1 my-api-backend
+```powershell
+new-drupal-headless my-api-backend
 ```
 
 ### To Contribute to Drupal Core
-```bash
-pwsh ./drupal-core-dev.ps1
+```powershell
+new-drupal-core
 ```
 
 ### To Contribute to a Module or Theme
-```bash
+```powershell
 # To set up a module (e.g., the Token module)
-pwsh ./drupal-module-dev.ps1 token
+new-drupal-module token
 
 # To set up a theme (e.g., the Bootstrap5 theme)
-pwsh ./drupal-theme-dev.ps1 bootstrap5
+new-drupal-theme bootstrap5
 ```
 
 ---
@@ -52,41 +43,33 @@ pwsh ./drupal-theme-dev.ps1 bootstrap5
 Before you start your first project, you need to set up a few tools on your computer. You only have to do this once.
 
 ### 1. Install WSL2 (Windows Subsystem for Linux)
-WSL2 is the foundation of the modern DDEV workflow on Windows. It lets you run a real Linux environment directly inside Windows, giving you the best of both worlds.
-
+WSL2 is the foundation of the modern DDEV workflow on Windows.
 Open PowerShell **as an administrator** and run:
 ```powershell
 wsl --install
 ```
-This will install WSL and a default Ubuntu distribution. If you already have it installed, it may give a harmless error that it already exists. **Restart your computer** after this step is complete.
+This will install WSL and a default Ubuntu distribution. **Restart your computer** after this step is complete.
 
 ### 2. Install DDEV (inside WSL)
 Once WSL is ready, you need to install DDEV inside your new Linux environment.
-
-First, open your Ubuntu terminal by typing `ubuntu` or `wsl` in your Start Menu. Then, run the following command inside the Ubuntu terminal:
+Open your Ubuntu terminal (type `wsl` in your Start Menu) and run:
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ddev/ddev/master/scripts/install_ddev.sh | bash
 ```
-After the script finishes, close and reopen your Ubuntu terminal.
 
-### 3. Install Git
-Git is essential for downloading Drupal code. While DDEV can manage it, it's best to have it in your Ubuntu environment. Run this command inside the Ubuntu terminal:
-```bash
-sudo apt update && sudo apt install git -y
-```
-
-### 4. Install PowerShell for WSL
-The automation scripts are `.ps1` files, so you need to install PowerShell inside your Ubuntu environment to run them. On Ubuntu, the recommended way is via `snap`:
+### 3. Install PowerShell for WSL (`pwsh`)
+The aliases in your Windows PowerShell profile need `pwsh` to be available inside WSL to work correctly.
+Open your Ubuntu terminal and run:
 ```bash
 sudo snap install powershell --classic
 ```
 
-### 5. (Optional) Install a Code Editor
-If you don't have one already, **Visual Studio Code** is highly recommended as it integrates seamlessly with WSL.
+### 4. (Optional) Install Git and a Code Editor
+It is highly recommended to have Git and a code editor like Visual Studio Code installed on your main Windows machine.
 ```powershell
+winget install -e --id Git.Git
 winget install -e --id Microsoft.VisualStudioCode
 ```
-You can then open your projects from within the WSL terminal using `code .`.
 
 ---
 

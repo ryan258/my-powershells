@@ -144,18 +144,21 @@ function Setup-NewSite {
         Write-Host "(3/6) Installing Drupal scaffold with Composer" -ForegroundColor Cyan
         ddev composer create drupal/recommended-project . --no-progress | Out-Null
 
-        Write-Host "(4/6) Installing Drush" -ForegroundColor Cyan
+        Write-Host "(4/7) Installing Drush" -ForegroundColor Cyan
         ddev composer require drush/drush --no-progress | Out-Null
 
+        Write-Host "(5/7) Installing Developer Tools (Devel, Admin Toolbar, Coder)" -ForegroundColor Cyan
+        ddev composer require drupal/devel drupal/admin_toolbar drupal/coder --dev --no-progress | Out-Null
+
         if (-not $SkipSiteInstall) {
-            Write-Host "(5/6) Installing Drupal via Drush with user/pass: admin/admin" -ForegroundColor Cyan
+            Write-Host "(6/7) Installing Drupal via Drush with user/pass: admin/admin" -ForegroundColor Cyan
             ddev drush site:install standard --account-name=admin --account-pass=admin -y | Out-Null
             $Global:DrupalAdminPassword = "admin"
         } else {
-            Write-Host "(5/6) Skipping Drush site install (-SkipSiteInstall provided)." -ForegroundColor Yellow
+            Write-Host "(6/7) Skipping Drush site install (-SkipSiteInstall provided)." -ForegroundColor Yellow
         }
 
-        Write-Host "(6/6) Finalizing environment" -ForegroundColor Cyan
+        Write-Host "(7/7) Finalizing environment" -ForegroundColor Cyan
         Show-ConnectionInfo -SkipLaunch:$SkipLaunch
     } finally {
         Pop-Location
